@@ -1,10 +1,31 @@
-import { mudConfig } from "@latticexyz/world/register";
+import { mudConfig, resolveTableId } from "@latticexyz/world/register";
 
 export default mudConfig({
+  worldContractName : "catch-mons",
+  excludeSystems : ["System3", "System2"],
+  enums : {
+    MonsterTypes : [
+      "None",
+      "Normal",
+      "Grass",
+      "Fire",
+      "Water",
+    ],
+  },
   tables: {
-    Counter: {
-      keySchema: {},
-      schema: "uint32",
+    Position: {
+      schema: {
+        x : "int32",
+        y : "int32",
+      }
     },
+    Monster : {
+      schema: {
+        x : "int32",
+        y : "int32",
+        monster_type : "MonsterTypes",
+        level : "uint16",
+      }
+    }
   },
 });
