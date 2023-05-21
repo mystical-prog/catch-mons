@@ -31,7 +31,7 @@ export default mudConfig({
         x : "int32",
         y : "int32",
         spawned_at : "uint256",
-        level : "uint16",
+        level : "uint32",
         monster_type : "MonsterTypes",
       }
     },
@@ -39,7 +39,7 @@ export default mudConfig({
       schema: {
         minted : "bool",
         monster_type : "MonsterTypes",
-        level : "uint16",
+        level : "uint32",
       }
     }
   },

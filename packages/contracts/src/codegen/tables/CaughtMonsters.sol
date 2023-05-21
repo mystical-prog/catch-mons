@@ -26,7 +26,7 @@ bytes32 constant CaughtMonstersTableId = _tableId;
 struct CaughtMonstersData {
   bool minted;
   MonsterTypes monster_type;
-  uint16 level;
+  uint32 level;
 }
 
 library CaughtMonsters {
@@ -35,7 +35,7 @@ library CaughtMonsters {
     SchemaType[] memory _schema = new SchemaType[](3);
     _schema[0] = SchemaType.BOOL;
     _schema[1] = SchemaType.UINT8;
-    _schema[2] = SchemaType.UINT16;
+    _schema[2] = SchemaType.UINT32;
 
     return SchemaLib.encode(_schema);
   }
@@ -147,25 +147,25 @@ library CaughtMonsters {
   }
 
   /** Get level */
-  function getLevel(bytes32 key) internal view returns (uint16 level) {
+  function getLevel(bytes32 key) internal view returns (uint32 level) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
-    return (uint16(Bytes.slice2(_blob, 0)));
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Get level (using the specified store) */
-  function getLevel(IStore _store, bytes32 key) internal view returns (uint16 level) {
+  function getLevel(IStore _store, bytes32 key) internal view returns (uint32 level) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
-    return (uint16(Bytes.slice2(_blob, 0)));
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Set level */
-  function setLevel(bytes32 key, uint16 level) internal {
+  function setLevel(bytes32 key, uint32 level) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
@@ -173,7 +173,7 @@ library CaughtMonsters {
   }
 
   /** Set level (using the specified store) */
-  function setLevel(IStore _store, bytes32 key, uint16 level) internal {
+  function setLevel(IStore _store, bytes32 key, uint32 level) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
@@ -199,7 +199,7 @@ library CaughtMonsters {
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 key, bool minted, MonsterTypes monster_type, uint16 level) internal {
+  function set(bytes32 key, bool minted, MonsterTypes monster_type, uint32 level) internal {
     bytes memory _data = encode(minted, monster_type, level);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -209,7 +209,7 @@ library CaughtMonsters {
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, bytes32 key, bool minted, MonsterTypes monster_type, uint16 level) internal {
+  function set(IStore _store, bytes32 key, bool minted, MonsterTypes monster_type, uint32 level) internal {
     bytes memory _data = encode(minted, monster_type, level);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -234,11 +234,11 @@ library CaughtMonsters {
 
     _table.monster_type = MonsterTypes(uint8(Bytes.slice1(_blob, 1)));
 
-    _table.level = (uint16(Bytes.slice2(_blob, 2)));
+    _table.level = (uint32(Bytes.slice4(_blob, 2)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(bool minted, MonsterTypes monster_type, uint16 level) internal view returns (bytes memory) {
+  function encode(bool minted, MonsterTypes monster_type, uint32 level) internal view returns (bytes memory) {
     return abi.encodePacked(minted, monster_type, level);
   }
 

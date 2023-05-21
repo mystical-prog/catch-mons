@@ -27,7 +27,7 @@ struct MonstersData {
   int32 x;
   int32 y;
   uint256 spawned_at;
-  uint16 level;
+  uint32 level;
   MonsterTypes monster_type;
 }
 
@@ -38,7 +38,7 @@ library Monsters {
     _schema[0] = SchemaType.INT32;
     _schema[1] = SchemaType.INT32;
     _schema[2] = SchemaType.UINT256;
-    _schema[3] = SchemaType.UINT16;
+    _schema[3] = SchemaType.UINT32;
     _schema[4] = SchemaType.UINT8;
 
     return SchemaLib.encode(_schema);
@@ -187,25 +187,25 @@ library Monsters {
   }
 
   /** Get level */
-  function getLevel(bytes32 key) internal view returns (uint16 level) {
+  function getLevel(bytes32 key) internal view returns (uint32 level) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
-    return (uint16(Bytes.slice2(_blob, 0)));
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Get level (using the specified store) */
-  function getLevel(IStore _store, bytes32 key) internal view returns (uint16 level) {
+  function getLevel(IStore _store, bytes32 key) internal view returns (uint32 level) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
-    return (uint16(Bytes.slice2(_blob, 0)));
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Set level */
-  function setLevel(bytes32 key, uint16 level) internal {
+  function setLevel(bytes32 key, uint32 level) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
@@ -213,7 +213,7 @@ library Monsters {
   }
 
   /** Set level (using the specified store) */
-  function setLevel(IStore _store, bytes32 key, uint16 level) internal {
+  function setLevel(IStore _store, bytes32 key, uint32 level) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
@@ -273,7 +273,7 @@ library Monsters {
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 key, int32 x, int32 y, uint256 spawned_at, uint16 level, MonsterTypes monster_type) internal {
+  function set(bytes32 key, int32 x, int32 y, uint256 spawned_at, uint32 level, MonsterTypes monster_type) internal {
     bytes memory _data = encode(x, y, spawned_at, level, monster_type);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -289,7 +289,7 @@ library Monsters {
     int32 x,
     int32 y,
     uint256 spawned_at,
-    uint16 level,
+    uint32 level,
     MonsterTypes monster_type
   ) internal {
     bytes memory _data = encode(x, y, spawned_at, level, monster_type);
@@ -318,9 +318,9 @@ library Monsters {
 
     _table.spawned_at = (uint256(Bytes.slice32(_blob, 8)));
 
-    _table.level = (uint16(Bytes.slice2(_blob, 40)));
+    _table.level = (uint32(Bytes.slice4(_blob, 40)));
 
-    _table.monster_type = MonsterTypes(uint8(Bytes.slice1(_blob, 42)));
+    _table.monster_type = MonsterTypes(uint8(Bytes.slice1(_blob, 44)));
   }
 
   /** Tightly pack full data using this table's schema */
@@ -328,7 +328,7 @@ library Monsters {
     int32 x,
     int32 y,
     uint256 spawned_at,
-    uint16 level,
+    uint32 level,
     MonsterTypes monster_type
   ) internal view returns (bytes memory) {
     return abi.encodePacked(x, y, spawned_at, level, monster_type);
