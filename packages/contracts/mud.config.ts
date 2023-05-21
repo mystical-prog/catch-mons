@@ -5,12 +5,19 @@ export default mudConfig({
   excludeSystems : ["System3", "System2"],
   enums : {
     MonsterTypes : [
-      "None",
+      "Unknown",
       "Normal",
       "Grass",
       "Fire",
       "Water",
     ],
+    Direction : [
+      "Unknown",
+      "Up",
+      "Down",
+      "Right",
+      "Left",
+    ]
   },
   tables: {
     Position: {
@@ -19,13 +26,38 @@ export default mudConfig({
         y : "int32",
       }
     },
-    Monster : {
+    Monsters : {
       schema: {
         x : "int32",
         y : "int32",
+        spawned_at : "uint256",
+        level : "uint16",
+        monster_type : "MonsterTypes",
+      }
+    },
+    CaughtMonsters : {
+      schema: {
+        minted : "bool",
         monster_type : "MonsterTypes",
         level : "uint16",
       }
     }
   },
+  modules: [
+    {
+      name: "KeysWithValueModule",
+      root: true,
+      args: [resolveTableId("Position")],
+    },
+    {
+      name: "KeysWithValueModule",
+      root: true,
+      args: [resolveTableId("Monsters")],      
+    },
+    {
+      name: "KeysWithValueModule",
+      root: true,
+      args: [resolveTableId("CaughtMonsters")],          
+    }
+  ]
 });

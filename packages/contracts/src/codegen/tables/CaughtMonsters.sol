@@ -20,24 +20,22 @@ import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCou
 // Import user types
 import { MonsterTypes } from "./../Types.sol";
 
-bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("Monster")));
-bytes32 constant MonsterTableId = _tableId;
+bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("CaughtMonsters")));
+bytes32 constant CaughtMonstersTableId = _tableId;
 
-struct MonsterData {
-  int32 x;
-  int32 y;
+struct CaughtMonstersData {
+  bool minted;
   MonsterTypes monster_type;
   uint16 level;
 }
 
-library Monster {
+library CaughtMonsters {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](4);
-    _schema[0] = SchemaType.INT32;
-    _schema[1] = SchemaType.INT32;
-    _schema[2] = SchemaType.UINT8;
-    _schema[3] = SchemaType.UINT16;
+    SchemaType[] memory _schema = new SchemaType[](3);
+    _schema[0] = SchemaType.BOOL;
+    _schema[1] = SchemaType.UINT8;
+    _schema[2] = SchemaType.UINT16;
 
     return SchemaLib.encode(_schema);
   }
@@ -51,12 +49,11 @@ library Monster {
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](4);
-    _fieldNames[0] = "x";
-    _fieldNames[1] = "y";
-    _fieldNames[2] = "monster_type";
-    _fieldNames[3] = "level";
-    return ("Monster", _fieldNames);
+    string[] memory _fieldNames = new string[](3);
+    _fieldNames[0] = "minted";
+    _fieldNames[1] = "monster_type";
+    _fieldNames[2] = "level";
+    return ("CaughtMonsters", _fieldNames);
   }
 
   /** Register the table's schema */
@@ -81,72 +78,38 @@ library Monster {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get x */
-  function getX(bytes32 key) internal view returns (int32 x) {
+  /** Get minted */
+  function getMinted(bytes32 key) internal view returns (bool minted) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
-    return (int32(uint32(Bytes.slice4(_blob, 0))));
+    return (_toBool(uint8(Bytes.slice1(_blob, 0))));
   }
 
-  /** Get x (using the specified store) */
-  function getX(IStore _store, bytes32 key) internal view returns (int32 x) {
+  /** Get minted (using the specified store) */
+  function getMinted(IStore _store, bytes32 key) internal view returns (bool minted) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
-    return (int32(uint32(Bytes.slice4(_blob, 0))));
+    return (_toBool(uint8(Bytes.slice1(_blob, 0))));
   }
 
-  /** Set x */
-  function setX(bytes32 key, int32 x) internal {
+  /** Set minted */
+  function setMinted(bytes32 key, bool minted) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((x)));
+    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((minted)));
   }
 
-  /** Set x (using the specified store) */
-  function setX(IStore _store, bytes32 key, int32 x) internal {
+  /** Set minted (using the specified store) */
+  function setMinted(IStore _store, bytes32 key, bool minted) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
-    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((x)));
-  }
-
-  /** Get y */
-  function getY(bytes32 key) internal view returns (int32 y) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32((key));
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
-    return (int32(uint32(Bytes.slice4(_blob, 0))));
-  }
-
-  /** Get y (using the specified store) */
-  function getY(IStore _store, bytes32 key) internal view returns (int32 y) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32((key));
-
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
-    return (int32(uint32(Bytes.slice4(_blob, 0))));
-  }
-
-  /** Set y */
-  function setY(bytes32 key, int32 y) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32((key));
-
-    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((y)));
-  }
-
-  /** Set y (using the specified store) */
-  function setY(IStore _store, bytes32 key, int32 y) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32((key));
-
-    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((y)));
+    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((minted)));
   }
 
   /** Get monster_type */
@@ -154,7 +117,7 @@ library Monster {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
     return MonsterTypes(uint8(Bytes.slice1(_blob, 0)));
   }
 
@@ -163,7 +126,7 @@ library Monster {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
     return MonsterTypes(uint8(Bytes.slice1(_blob, 0)));
   }
 
@@ -172,7 +135,7 @@ library Monster {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked(uint8(monster_type)));
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked(uint8(monster_type)));
   }
 
   /** Set monster_type (using the specified store) */
@@ -180,7 +143,7 @@ library Monster {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
-    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked(uint8(monster_type)));
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked(uint8(monster_type)));
   }
 
   /** Get level */
@@ -188,7 +151,7 @@ library Monster {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
     return (uint16(Bytes.slice2(_blob, 0)));
   }
 
@@ -197,7 +160,7 @@ library Monster {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
     return (uint16(Bytes.slice2(_blob, 0)));
   }
 
@@ -206,7 +169,7 @@ library Monster {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((level)));
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((level)));
   }
 
   /** Set level (using the specified store) */
@@ -214,11 +177,11 @@ library Monster {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
-    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((level)));
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((level)));
   }
 
   /** Get the full data */
-  function get(bytes32 key) internal view returns (MonsterData memory _table) {
+  function get(bytes32 key) internal view returns (CaughtMonstersData memory _table) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
@@ -227,7 +190,7 @@ library Monster {
   }
 
   /** Get the full data (using the specified store) */
-  function get(IStore _store, bytes32 key) internal view returns (MonsterData memory _table) {
+  function get(IStore _store, bytes32 key) internal view returns (CaughtMonstersData memory _table) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
 
@@ -236,8 +199,8 @@ library Monster {
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 key, int32 x, int32 y, MonsterTypes monster_type, uint16 level) internal {
-    bytes memory _data = encode(x, y, monster_type, level);
+  function set(bytes32 key, bool minted, MonsterTypes monster_type, uint16 level) internal {
+    bytes memory _data = encode(minted, monster_type, level);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
@@ -246,8 +209,8 @@ library Monster {
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, bytes32 key, int32 x, int32 y, MonsterTypes monster_type, uint16 level) internal {
-    bytes memory _data = encode(x, y, monster_type, level);
+  function set(IStore _store, bytes32 key, bool minted, MonsterTypes monster_type, uint16 level) internal {
+    bytes memory _data = encode(minted, monster_type, level);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((key));
@@ -256,29 +219,27 @@ library Monster {
   }
 
   /** Set the full data using the data struct */
-  function set(bytes32 key, MonsterData memory _table) internal {
-    set(key, _table.x, _table.y, _table.monster_type, _table.level);
+  function set(bytes32 key, CaughtMonstersData memory _table) internal {
+    set(key, _table.minted, _table.monster_type, _table.level);
   }
 
   /** Set the full data using the data struct (using the specified store) */
-  function set(IStore _store, bytes32 key, MonsterData memory _table) internal {
-    set(_store, key, _table.x, _table.y, _table.monster_type, _table.level);
+  function set(IStore _store, bytes32 key, CaughtMonstersData memory _table) internal {
+    set(_store, key, _table.minted, _table.monster_type, _table.level);
   }
 
   /** Decode the tightly packed blob using this table's schema */
-  function decode(bytes memory _blob) internal pure returns (MonsterData memory _table) {
-    _table.x = (int32(uint32(Bytes.slice4(_blob, 0))));
+  function decode(bytes memory _blob) internal pure returns (CaughtMonstersData memory _table) {
+    _table.minted = (_toBool(uint8(Bytes.slice1(_blob, 0))));
 
-    _table.y = (int32(uint32(Bytes.slice4(_blob, 4))));
+    _table.monster_type = MonsterTypes(uint8(Bytes.slice1(_blob, 1)));
 
-    _table.monster_type = MonsterTypes(uint8(Bytes.slice1(_blob, 8)));
-
-    _table.level = (uint16(Bytes.slice2(_blob, 9)));
+    _table.level = (uint16(Bytes.slice2(_blob, 2)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(int32 x, int32 y, MonsterTypes monster_type, uint16 level) internal view returns (bytes memory) {
-    return abi.encodePacked(x, y, monster_type, level);
+  function encode(bool minted, MonsterTypes monster_type, uint16 level) internal view returns (bytes memory) {
+    return abi.encodePacked(minted, monster_type, level);
   }
 
   /** Encode keys as a bytes32 array using this table's schema */
@@ -301,5 +262,11 @@ library Monster {
     _keyTuple[0] = bytes32((key));
 
     _store.deleteRecord(_tableId, _keyTuple);
+  }
+}
+
+function _toBool(uint8 value) pure returns (bool result) {
+  assembly {
+    result := value
   }
 }

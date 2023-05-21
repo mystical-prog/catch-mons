@@ -21,13 +21,31 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
-    Monster: (() => {
-      const tableId = new TableId("", "Monster");
+    Monsters: (() => {
+      const tableId = new TableId("", "Monsters");
       return defineComponent(
         world,
         {
           x: RecsType.Number,
           y: RecsType.Number,
+          spawned_at: RecsType.BigInt,
+          level: RecsType.Number,
+          monster_type: RecsType.Number,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    CaughtMonsters: (() => {
+      const tableId = new TableId("", "CaughtMonsters");
+      return defineComponent(
+        world,
+        {
+          minted: RecsType.Boolean,
           monster_type: RecsType.Number,
           level: RecsType.Number,
         },
