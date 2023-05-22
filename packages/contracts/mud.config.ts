@@ -37,9 +37,13 @@ export default mudConfig({
     },
     CaughtMonsters : {
       schema: {
+        owned_by : "address",
         minted : "bool",
         monster_type : "MonsterTypes",
         level : "uint32",
+      },
+      keySchema: {
+        id : "uint256",
       }
     }
   },

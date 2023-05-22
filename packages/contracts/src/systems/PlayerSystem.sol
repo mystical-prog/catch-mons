@@ -4,7 +4,7 @@ import { System } from "@latticexyz/world/src/System.sol";
 import { addressToEntity } from "../Utils.sol";
 import { getKeysWithValue } from "@latticexyz/world/src/modules/keyswithvalue/getKeysWithValue.sol";
 
-import { Position, PositionData, PositionTableId } from "../codegen/Tables.sol";
+import { Position, PositionData, PositionTableId, CaughtMonsters, CaughtMonstersData, CaughtMonstersTableId } from "../codegen/Tables.sol";
 import { Direction } from "../codegen/Types.sol";
 
 contract PlayerSystem is System {

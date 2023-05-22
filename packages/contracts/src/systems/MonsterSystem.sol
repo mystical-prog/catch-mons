@@ -3,13 +3,15 @@ pragma solidity >=0.8.0;
 import { System } from "@latticexyz/world/src/System.sol";
 import { getKeysWithValue } from "@latticexyz/world/src/modules/keyswithvalue/getKeysWithValue.sol";
 
-import { Monsters, MonstersData, MonstersTableId, Position, PositionData, PositionTableId } from "../codegen/Tables.sol";
+import { Monsters, MonstersData, MonstersTableId, Position, PositionData, PositionTableId, CaughtMonsters } from "../codegen/Tables.sol";
 import { MonsterTypes } from "../codegen/Types.sol";
 import { genRanNumber, max, addressToEntity, abs } from "../Utils.sol";
 
 contract MonsterSystem is System {
 
     bytes32 internal constant MONSTER = "0x0000";
+
+    uint256 internal caught_count = 0;
 
     function spawnMonster(int32 x, int32 y) public {
         require(x != 0 || y != 0, "Cannot spawn at zero coord");
@@ -39,6 +41,7 @@ contract MonsterSystem is System {
 
     function catchMonster() public {
         bytes32 player = addressToEntity(_msgSender());
+
         PositionData memory existingPosition = Position.get(player);
         require(existingPosition.x != 0 || existingPosition.y != 0, "player not spawned!");
 
@@ -48,9 +51,9 @@ contract MonsterSystem is System {
 
         int32 distance = max(abs(existingPosition.x - instance.x), abs(existingPosition.y - instance.y));
         require(distance == 0 || distance == 1 || distance == 2 || distance == 3 || distance == 4, "Monster not in range!");
-
-        // Do MonsterCatch Entry Here!!
-
+        
+        CaughtMonsters.set(caught_count, _msgSender(), false, instance.monster_type, instance.level);
+        caught_count += 1;
         despawn();
     }
 

@@ -45,6 +45,7 @@ export function defineContractComponents(world: World) {
       return defineComponent(
         world,
         {
+          owned_by: RecsType.String,
           minted: RecsType.Boolean,
           monster_type: RecsType.Number,
           level: RecsType.Number,
