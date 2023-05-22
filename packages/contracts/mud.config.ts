@@ -1,7 +1,6 @@
 import { mudConfig, resolveTableId } from "@latticexyz/world/register";
 
 export default mudConfig({
-  worldContractName : "catch-mons",
   excludeSystems : ["System3", "System2"],
   enums : {
     MonsterTypes : [

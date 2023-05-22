@@ -6,6 +6,29 @@ export enum Maps {
   Main = "Main",
 }
 
+export enum Directions {
+  Unknown,
+  Up,
+  Down,
+  Right,
+  Left,
+}
+
+export function generateRandomX(min = -20, max = 20) {
+  let difference = max - min;
+  let rand = Math.random();
+  rand = Math.floor( rand * difference);
+  rand = rand + min;
+  return rand;
+}
+export function generateRandomY(min = -10, max = 10) {
+  let difference = max - min;
+  let rand = Math.random();
+  rand = Math.floor( rand * difference);
+  rand = rand + min;
+  return rand;
+}
+
 export enum Animations {
   SwordsmanIdle = "SwordsmanIdle",
 }

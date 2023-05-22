@@ -18,7 +18,7 @@ contract MonsterSystem is System {
 
         MonstersData memory instance = Monsters.get(MONSTER);
         
-        require(block.number > (instance.spawned_at + 5), "Invalid Tick");
+        require(block.number > (instance.spawned_at + 8), "Invalid Tick");
 
         uint256 rand = genRanNumber(x, y, _msgSender());
         uint32 level = uint32(rand % 25);
@@ -46,7 +46,7 @@ contract MonsterSystem is System {
         require(existingPosition.x != 0 || existingPosition.y != 0, "player not spawned!");
 
         MonstersData memory instance = Monsters.get(MONSTER);
-        require(block.number < (instance.spawned_at + 5), "Monster Fled!");
+        require(block.number < (instance.spawned_at + 8), "Monster Fled!");
         require(instance.monster_type != MonsterTypes.Unknown, "Unknown Monster");
 
         int32 distance = max(abs(existingPosition.x - instance.x), abs(existingPosition.y - instance.y));

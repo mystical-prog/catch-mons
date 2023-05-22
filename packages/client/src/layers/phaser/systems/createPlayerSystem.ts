@@ -1,7 +1,7 @@
-import { Has, defineEnterSystem, defineSystem, getComponentValueStrict } from "@latticexyz/recs";
+import { Has, defineEnterSystem, defineExitSystem, defineSystem, getComponentValueStrict } from "@latticexyz/recs";
 import { PhaserLayer } from "../createPhaserLayer";
 import { pixelCoordToTileCoord, tileCoordToPixelCoord } from "@latticexyz/phaserx";
-import { TILE_HEIGHT, TILE_WIDTH } from "../constants";
+import { Directions, TILE_HEIGHT, TILE_WIDTH } from "../constants";
 
 export function createPlayerSystem(layer : PhaserLayer) {
     const {
@@ -12,6 +12,8 @@ export function createPlayerSystem(layer : PhaserLayer) {
             },
             systemCalls: {
                 spawnPlayer,
+                movePlayer,
+                catchMonster,
             }
         },
         scenes: {
@@ -32,6 +34,26 @@ export function createPlayerSystem(layer : PhaserLayer) {
         spawnPlayer(position.x, position.y);
     });
 
+    input.onKeyPress((keys) => keys.has("W"), () => {
+        movePlayer(Directions.Up);
+    });
+
+    input.onKeyPress((keys) => keys.has("X"), () => {
+        catchMonster();
+    });
+
+    input.onKeyPress((keys) => keys.has("S"), () => {
+        movePlayer(Directions.Down);
+    });
+
+    input.onKeyPress((keys) => keys.has("A"), () => {
+        movePlayer(Directions.Left);
+    });
+
+    input.onKeyPress((keys) => keys.has("D"), () => {
+        movePlayer(Directions.Right);
+    });
+
     defineEnterSystem(world, [Has(Position)], ({ entity }) => {
         const playerObj = objectPool.get(entity, "Rectangle");
 
@@ -42,6 +64,10 @@ export function createPlayerSystem(layer : PhaserLayer) {
                 rect.setFillStyle(0xff0000);
             }
         })
+    });
+
+    defineExitSystem(world, [Has(Position)], ({entity}) => {
+        objectPool.remove(entity);
     });
 
     defineSystem(world, [Has(Position)], ({entity}) => {
@@ -56,6 +82,5 @@ export function createPlayerSystem(layer : PhaserLayer) {
                 rect.setPosition(pixelPosition.x, pixelPosition.y);
             }
         })
-
     });
 }
